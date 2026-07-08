@@ -1,18 +1,42 @@
 set dotenv-load := true
 
+# Show available recipes
 default:
   @just --list
 
+# Initialize the project: create .env from example if missing and tidy Go modules
 init:
   @[ -f .env ] || cp example.env .env;
   @go mod tidy;
 
+# Build the uuidv7 binary
 build-uuidv7:
-  @go build -o ./bin/uuidv7 ./cmd/uuidv7;
+  @CGO_ENABLED=0 go build -ldflags="-s -w" -o ./bin/uuidv7 ./cmd/uuidv7;
 
+# Run the uuidv7 command directly
 run-uuidv7:
   @go run -race ./cmd/uuidv7;
 
+# Install the uuidv7 binary to the specified install directory
 install-uuidv7: build-uuidv7
   @mkdir -p $INSTALL_DIR
   @cp ./bin/uuidv7 $INSTALL_DIR/uuidv7;
+
+# Build the work-item-id binary
+build-work-item-id:
+  @CGO_ENABLED=0 go build -ldflags="-s -w" -o ./bin/work-item-id ./cmd/work-item-id;
+
+# Run the work-item-id command directly
+run-work-item-id:
+  @go run -race ./cmd/work-item-id;
+
+# Install the work-item-id binary to the specified install directory
+install-work-item-id: build-work-item-id
+  @mkdir -p $INSTALL_DIR
+  @cp ./bin/work-item-id $INSTALL_DIR/work-item-id;
+
+# Build all binaries
+build-all: build-uuidv7 build-work-item-id
+
+# Install all binaries
+install-all: install-uuidv7 install-work-item-id
