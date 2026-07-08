@@ -1,3 +1,4 @@
+// Package main implements a CLI tool for generating UUIDv7 values.
 package main
 
 import (

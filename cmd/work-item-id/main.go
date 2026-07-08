@@ -1,3 +1,4 @@
+// Package main implements a CLI tool for generating work item IDs.
 package main
 
 import (

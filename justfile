@@ -4,10 +4,11 @@ set dotenv-load := true
 default:
   @just --list
 
-# Initialize the project: create .env from example if missing and tidy Go modules
+# Initialize the project
 init:
   @[ -f .env ] || cp example.env .env;
   @go mod tidy;
+  @git config core.hooksPath .githooks;
 
 # Build the uuidv7 binary
 build-uuidv7:
