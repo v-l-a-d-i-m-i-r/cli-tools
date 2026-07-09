@@ -18,6 +18,10 @@ test:
 lint:
   @go tool golangci-lint run;
 
+# Debug a specific linter (e.g., just debug-linter revive)
+debug-linter linter_name:
+  @GL_DEBUG={{linter_name}} go tool golangci-lint run --enable-only={{linter_name}} 2>&1;
+
 # Build the uuidv7 binary
 build-uuidv7:
   @CGO_ENABLED=0 go build -ldflags="-s -w" -o ./bin/uuidv7 ./cmd/uuidv7;
