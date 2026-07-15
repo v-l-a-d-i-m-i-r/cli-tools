@@ -18,6 +18,10 @@ test:
 lint:
   @go tool golangci-lint run;
 
+# Run linter and fix
+lint-fix:
+  @go tool golangci-lint run --fix;
+
 # Debug a specific linter (e.g., just debug-linter revive)
 debug-linter linter_name:
   @GL_DEBUG={{linter_name}} go tool golangci-lint run --enable-only={{linter_name}} 2>&1;
@@ -49,10 +53,20 @@ install-work-item-id: build-work-item-id
   @cp ./bin/work-item-id $INSTALL_DIR/work-item-id;
 
 # Build all binaries
-build-all: build-uuidv7 build-work-item-id build-docker-hub-image-tags
+build-all:
+  @CGO_ENABLED=0 go build -ldflags="-s -w" -o ./bin/ \
+    ./cmd/uuidv7 \
+    ./cmd/work-item-id \
+    ./cmd/docker-hub-image-tags \
+    ./cmd/tuxi;
 
 # Install all binaries
-install-all: install-uuidv7 install-work-item-id install-docker-hub-image-tags
+install-all: build-all
+  @mkdir -p $INSTALL_DIR
+  @cp ./bin/uuidv7 $INSTALL_DIR/uuidv7;
+  @cp ./bin/work-item-id $INSTALL_DIR/work-item-id;
+  @cp ./bin/docker-hub-image-tags $INSTALL_DIR/docker-hub-image-tags;
+  @cp ./bin/tuxi $INSTALL_DIR/tuxi;
 
 # Build the docker-hub-image-tags binary
 build-docker-hub-image-tags:
@@ -66,3 +80,16 @@ run-docker-hub-image-tags namespace repository:
 install-docker-hub-image-tags: build-docker-hub-image-tags
   @mkdir -p $INSTALL_DIR
   @cp ./bin/docker-hub-image-tags $INSTALL_DIR/docker-hub-image-tags;
+
+# Build the tuxi binary
+build-tuxi:
+  @CGO_ENABLED=0 go build -ldflags="-s -w" -o ./bin/tuxi ./cmd/tuxi;
+
+# Run the tuxi command directly (e.g. just run-tuxi window-status-format '<json>')
+run-tuxi *args:
+  @go run -race ./cmd/tuxi {{args}};
+
+# Install the tuxi binary to the specified install directory
+install-tuxi: build-tuxi
+  @mkdir -p $INSTALL_DIR
+  @cp ./bin/tuxi $INSTALL_DIR/tuxi;
